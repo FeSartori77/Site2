@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Game – Sistema Multijogos</title>
+<style>
+  :root{
+    --bg:#0b0d1a; --bg2:#121530; --card:#171b3a; --card2:#1d2249;
+    --text:#f1f3ff; --muted:#9aa3c7;
+    --neon:#22d3ee; --purple:#a855f7; --lime:#84cc16; --gold:#facc15; --pink:#f472b6;
+    --border:#2a3170;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%, #2a1a5e 0%, transparent 60%),
+             radial-gradient(900px 500px at 100% 30%, #0d3b4a 0%, transparent 60%),
+             var(--bg);
+    color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;font-size:16px;min-height:100vh;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+  h1,h2,h3{line-height:1.25;color:var(--text)}
+  h2{font-size:28px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:6px;height:24px;border-radius:3px;background:linear-gradient(var(--neon),var(--purple));box-shadow:0 0 12px var(--neon)}
+  h3{font-size:18px;margin-bottom:6px}
+  p{color:var(--muted)}
+  section{padding:56px 0}
+
+  .promo{
+    background:linear-gradient(90deg,var(--purple),var(--pink),var(--purple));
+    background-size:200% 100%;animation:shift 6s linear infinite;
+    color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-weight:700;letter-spacing:.5px;
+  }
+  @keyframes shift{to{background-position:200% 0}}
+
+  header{
+    display:flex;justify-content:space-between;align-items:center;padding:18px 0;
+    border-bottom:1px solid var(--border);background:rgba(11,13,26,.7);backdrop-filter:blur(8px);
+    position:sticky;top:0;z-index:10;
+  }
+  .logo{font-size:22px;font-weight:900;letter-spacing:1px;
+    background:linear-gradient(90deg,var(--neon),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+  nav a{color:var(--muted);text-decoration:none;margin-left:24px;font-size:15px;font-weight:600;transition:color .15s}
+  nav a:hover{color:var(--neon)}
+
+  .hero{text-align:center;padding:80px 0 64px;position:relative}
+  .badge{
+    display:inline-block;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700;
+    background:rgba(34,211,238,.12);color:var(--neon);border:1px solid rgba(34,211,238,.4);margin-bottom:18px
+  }
+  .hero h1{font-size:clamp(32px,5.5vw,54px);font-weight:900;letter-spacing:-0.5px}
+  .hero h1 span{background:linear-gradient(90deg,var(--neon),var(--purple),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{margin:20px auto 28px;max-width:640px;font-size:18px}
+  .prices{display:flex;justify-content:center;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .old{text-decoration:line-through;color:var(--muted);font-size:18px}
+  .new{font-size:44px;font-weight:900;color:var(--gold);text-shadow:0 0 18px rgba(250,204,21,.35)}
+
+  .btn{
+    display:inline-block;margin-top:24px;padding:16px 32px;
+    background:linear-gradient(90deg,var(--neon),var(--purple));color:#06081a;text-decoration:none;
+    font-size:16px;font-weight:800;border-radius:12px;border:none;cursor:pointer;
+    box-shadow:0 8px 24px rgba(168,85,247,.35);transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(34,211,238,.35)}
+  .btn:active{transform:translateY(1px)}
+
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:18px;padding:32px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+
+  .stat{text-align:center;padding:24px;background:var(--card);border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden}
+  .stat::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--neon),var(--purple))}
+  .stat b{display:block;font-size:36px;font-weight:900;color:var(--neon);text-shadow:0 0 14px rgba(34,211,238,.4)}
+  .stat span{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+  .xp{margin-top:20px}
+  .xp-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .xp-bar{height:12px;border-radius:999px;background:#0c0f24;border:1px solid var(--border);overflow:hidden}
+  .xp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--lime),var(--neon));border-radius:999px;box-shadow:0 0 12px var(--lime);transition:width 1.4s ease}
+
+  .console{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:18px;text-align:center;font-weight:700;font-size:15px;color:var(--text);
+    transition:transform .15s, border-color .15s, box-shadow .15s;
+  }
+  .console:hover{transform:translateY(-3px);border-color:var(--purple);box-shadow:0 8px 22px rgba(168,85,247,.25)}
+
+  .step{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .15s}
+  .step:hover{border-color:var(--neon)}
+  .step .n{
+    display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,var(--neon),var(--purple));color:#06081a;font-weight:900;margin-bottom:12px;
+    box-shadow:0 0 14px rgba(34,211,238,.35)
+  }
+
+  .price{text-align:center;position:relative;overflow:hidden}
+  .price::before{content:"";position:absolute;inset:-1px;border-radius:18px;padding:1px;
+    background:linear-gradient(135deg,var(--neon),var(--purple),var(--gold));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .price .old-price{color:var(--muted);text-decoration:line-through}
+  .price .big{font-size:52px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(250,204,21,.3);margin:8px 0}
+  .price .inst{color:var(--muted)}
+  .price small{display:block;margin-top:18px;color:var(--muted)}
+
+  .guarantee{border-left:4px solid var(--lime)}
+  .guarantee h2::before{background:var(--lime);box-shadow:0 0 12px var(--lime)}
+
+  details{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:12px;transition:border-color .15s}
+  details[open]{border-color:var(--purple)}
+  summary{cursor:pointer;font-weight:700;color:var(--text)}
+  details p{margin-top:10px}
+
+  .req ul{list-style:none}
+  .req li{padding:10px 0;border-bottom:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:10px}
+  .req li::before{content:"✔";color:var(--lime);font-weight:900}
+  .req li:last-child{border-bottom:none}
+
+  footer{text-align:center;padding:40px 0;font-size:14px;color:var(--muted);border-top:1px solid var(--border);margin-top:20px;background:rgba(11,13,26,.6)}
+  footer p{margin:4px 0}
+
+  .console{cursor:pointer}
+  .modal{position:fixed;inset:0;background:rgba(5,6,15,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal[hidden]{display:none}
+  .modal-box{background:var(--card);border:1px solid var(--purple);border-radius:18px;padding:28px;max-width:900px;width:100%;max-height:90vh;overflow:auto;position:relative;box-shadow:0 0 30px rgba(168,85,247,.4)}
+  .modal-close{position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px}
+  .covers{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-top:16px}
+  .covers img{width:100%;border-radius:12px;border:1px solid var(--border);transition:transform .15s,box-shadow .15s}
+  .covers img:hover{transform:translateY(-4px);box-shadow:0 0 18px var(--neon)}
+
+  @media (max-width:640px){
+    nav{display:none}
+    .new{font-size:34px}
+    .price .big{font-size:42px}
+    section{padding:40px 0}
+    .card{padding:24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="promo">⚡ OFERTA POR TEMPO LIMITADO ⚡</div>
+
+<div class="wrap">
+  <header>
+    <div class="logo">Retro Game</div>
+    <nav>
+      <a href="#recursos">Recursos</a>
+      <a href="#consoles">Consoles</a>
+      <a href="#preco">Preço</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <span class="badge">🎮 NOVO JOGO · PLAYER 1</span>
+    <h1>Mais de <span>7.000 jogos clássicos</span><br>em um único sistema</h1>
+    <p class="sub">Uma biblioteca completa de jogos que marcaram uma geração, reunida para você jogar no seu PC ou notebook.</p>
+    <div class="prices">
+      <span class="old">De R$ 297,00</span>
+      <span class="new">Por R$ 97,00</span>
+    </div>
+    <a class="btn" href="#preco">▶ Quero começar agora</a>
+  </section>
+
+  <section class="card" style="margin-bottom:0">
+    <h2>Assista ao vídeo</h2>
+    <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:14px;overflow:hidden;border:1px solid var(--border)">
+      <iframe src="https://www.youtube.com/embed/W-HSQjGYGf8?autoplay=1&mute=1" title="Vídeo de apresentação" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="grid">
+      <div class="stat"><b>7K+</b><span>Jogos</span></div>
+      <div class="stat"><b>20+</b><span>Consoles</span></div>
+      <div class="stat"><b>1</b><span>Sistema</span></div>
+      <div class="stat"><b>∞</b><span>Save states</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-bottom:0">
+    <h2>Nostalgia de verdade</h2>
+    <p style="margin-bottom:12px">Reviva os clássicos da sua infância com catálogos de vários consoles, todos integrados em um único sistema.</p>
+    <p>Ideal para quem está conhecendo os clássicos e para quem quer relembrar aquela época.</p>
+    <div class="xp">
+      <div class="xp-label"><span>Progresso da sua coleção</span><span>LVL 99</span></div>
+      <div class="xp-bar"><i id="xp"></i></div>
+    </div>
+  </section>
+
+  <section id="consoles">
+    <h2>Consoles incluídos</h2>
+    <div class="grid">
+      <div class="console">Atari 2600</div>
+      <div class="console">Nintendinho</div>
+      <div class="console">Super Nintendo</div>
+      <div class="console">Mega Drive</div>
+      <div class="console">Master System</div>
+      <div class="console">Game Boy</div>
+      <div class="console">Nintendo 64</div>
+      <div class="console">Dreamcast</div>
+      <div class="console">Arcade</div>
+      <div class="console">Fliperamas</div>
+      <div class="console">PlayStation</div>
+      <div class="console">Sega Saturn</div>
+    </div>
+  </section>
+
+  <section id="recursos">
+    <h2>Recursos</h2>
+    <div class="grid">
+      <div class="step"><div class="n">1</div><h3>Download digital</h3><p>Baixou, jogou. Simples e rápido.</p></div>
+      <div class="step"><div class="n">2</div><h3>Save state</h3><p>Salve o progresso a qualquer momento e continue depois.</p></div>
+      <div class="step"><div class="n">3</div><h3>HD externo</h3><p>Instale em um HD externo e não ocupe espaço no computador.</p></div>
+      <div class="step"><div class="n">4</div><h3>Controle</h3><p>Compatível com controles Xbox, PS4 e outros com driver XINPUT.</p></div>
+    </div>
+  </section>
+
+  <section id="preco" class="card price">
+    <h2 style="justify-content:center">Preço especial</h2>
+    <p class="old-price">De R$ 197,00</p>
+    <p class="big">R$ 67,00</p>
+    <p class="inst">ou 12x de R$ 6,93 no cartão</p>
+    <a class="btn" href="https://pay.kiwify.com.br/iLDn5K5?afid=K6yvnXSP">🛒 Comprar agora</a>
+    <small>Pagamento seguro · Acesso imediato por e-mail</small>
+  </section>
+
+  <section class="card guarantee" style="margin-top:40px">
+    <h2>Compra segura</h2>
+    <p>Garantia de 7 dias conforme o Código de Defesa do Consumidor (Art. 49). Se não gostar, solicite reembolso.</p>
+  </section>
+
+  <section id="faq">
+    <h2>Dúvidas frequentes</h2>
+    <details><summary>Funciona em Mac OS ou Linux?</summary><p>No momento, somente Windows 10 e 11.</p></details>
+    <details><summary>Salva o progresso dos jogos?</summary><p>Sim! Você pode salvar e continuar de onde parou.</p></details>
+    <details><summary>Posso instalar em um HD externo?</summary><p>Sim, assim não ocupa espaço interno no computador.</p></details>
+    <details><summary>Recebo algo pelo correio?</summary><p>Não. Você recebe acesso por e-mail com o download e os tutoriais de instalação.</p></details>
+  </section>
+
+  <section class="card req" style="margin-bottom:40px">
+    <h2>Requisitos mínimos</h2>
+    <ul>
+      <li>Windows 10 64 bits</li>
+      <li>Intel Core i3 dual core 3GHz ou AMD Ryzen 3</li>
+      <li>8 GB de RAM</li>
+      <li>Intel HD 620, NVIDIA GTX ou AMD Radeon R5</li>
+      <li>150 GB livres de disco</li>
+    </ul>
+  </section>
+</div>
+
+<footer>
+  <p>© 2026 Retro Game · Todos os direitos reservados</p>
+  <p>Este site é um modelo de demonstração. Substitua textos, preços e links pelos seus.</p>
+</footer>
+
+<script>
+  window.addEventListener('load', function(){
+    setTimeout(function(){ document.getElementById('xp').style.width = '92%'; }, 300);
+  });
+window.addEventListener('load', function(){
+    var CONSOLES = {
+      'Atari 2600': {c:'#e04b2b', games:['Pitfall!','Space Invaders','Pac-Man','Adventure']},
+      'Nintendinho': {c:'#c62828', games:['Super Mario Bros.','Donkey Kong','Contra','Mega Man']},
+      'Super Nintendo': {c:'#6d28d9', games:['Super Mario World','Chrono Trigger','Street Fighter II','A Link to the Past']},
+      'Mega Drive': {c:'#1e3a8a', games:['Sonic the Hedgehog','Streets of Rage 2','Altered Beast','Gunstar Heroes']},
+      'Master System': {c:'#0f766e', games:['Alex Kidd','Wonder Boy','Phantasy Star','Sonic Chaos']},
+      'Game Boy': {c:'#65a30d', games:['Tetris','Pokémon Red','Link\'s Awakening','Kirby\'s Dream Land']},
+      'Nintendo 64': {c:'#ca8a04', games:['GoldenEye 007','Ocarina of Time','Mario Kart 64','Super Smash Bros.']},
+      'Dreamcast': {c:'#ea580c', games:['Sonic Adventure','Crazy Taxi','Shenmue','Jet Set Radio']},
+      'Arcade': {c:'#db2777', games:['Galaga','Street Fighter','Metal Slug','Pac-Man']},
+      'Fliperamas': {c:'#7c3aed', games:['Ms. Pac-Man','Dig Dug','Donkey Kong Jr.','Frogger']},
+      'PlayStation': {c:'#2563eb', games:['Crash Bandicoot','Final Fantasy VII','Metal Gear Solid','Gran Turismo']},
+      'Sega Saturn': {c:'#0891b2', games:['Nights into Dreams','Virtua Fighter 2','Panzer Dragoon','Dead or Alive']}
+    };
+    // Cole aqui as URLs das capas reais (ex.: 'Pitfall!':'https://seusite.com/pitfall.jpg').
+    // Os jogos sem URL usam a capa ilustrativa gerada automaticamente.
+    var COVER_URLS = {};
+    function cover(console_, title, color, i){
+      var stars='';
+      for(var k=0;k<14;k++){var x=(k*37+i*11)%200, y=(k*53+i*17)%120; stars+='<rect x="'+x+'" y="'+y+'" width="3" height="3" fill="#fff" opacity=".7"/>';}
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'+
+        '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'"/><stop offset="1" stop-color="#0b0d1a"/></linearGradient></defs>'+
+        '<rect width="200" height="280" fill="url(#g)"/>'+stars+
+        '<rect x="30" y="120" width="140" height="70" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/>'+
+        '<text x="100" y="30" text-anchor="middle" font-family="monospace" font-size="12" fill="#facc15">'+console_+'</text>'+
+        '<text x="100" y="160" text-anchor="middle" font-family="monospace" font-size="16" font-weight="bold" fill="#fff">'+title+'</text>'+
+        '<text x="100" y="250" text-anchor="middle" font-family="monospace" font-size="10" fill="#fff" opacity=".6">CAPA ILUSTRATIVA</text>'+
+        '</svg>';
+      return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+    }
+    var modal=document.getElementById('modal'), grid=document.getElementById('mgrid'), mt=document.getElementById('mtitle');
+    function close(){ modal.hidden=true; grid.innerHTML=''; }
+    document.querySelectorAll('.console').forEach(function(el){
+      el.addEventListener('click', function(){
+        var name=el.textContent.trim(), d=CONSOLES[name];
+        if(!d) return;
+        mt.textContent='Jogos de '+name;
+        grid.innerHTML='';
+        d.games.forEach(function(g,i){
+          var img=document.createElement('img'); img.alt='Capa de '+g; img.loading='lazy'; img.src=COVER_URLS[g]||cover(name,g,d.c,i);
+          grid.appendChild(img);
+        });
+        modal.hidden=false;
+      });
+    });
+    document.getElementById('mclose').addEventListener('click', close);
+    modal.addEventListener('click', function(e){ if(e.target===modal) close(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  });
+</script>
+<div id="modal" class="modal" hidden><div class="modal-box"><button id="mclose" class="modal-close" aria-label="Fechar">✕</button><h3 id="mtitle"></h3><div id="mgrid" class="covers"></div></div></div>
+</body>
+</html>
